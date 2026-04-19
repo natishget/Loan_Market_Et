@@ -1,0 +1,177 @@
+Create a modern, professional, and visually attractive cross-platform mobile app using React Native with Expo and TypeScript.
+
+---
+
+## CORE REQUIREMENTS
+
+* FRONTEND ONLY (no backend)
+* Use Expo (must run with npx expo start)
+* Use TypeScript
+* Use Redux Toolkit (RTK) for global state
+* Use React Redux hooks (useDispatch, useSelector)
+* Use Zod for validation
+* Use Lucide Icons (lucide-react-native)
+* Must work on Android (version 10+) and iOS
+* Include mock/demo data
+
+---
+
+## APP PURPOSE
+
+The app is for traders in Ethiopia to digitally create and manage loan agreements without visiting government offices. It also includes a marketplace where lenders can discover and accept loan requests from unknown borrowers.
+
+---
+
+## PROJECT STRUCTURE (STRICT)
+
+* /app or /screens
+* /components
+* /navigation
+* /store
+
+  * store.ts
+  * hooks.ts
+  * slices/
+
+    * authSlice.ts
+    * loanSlice.ts
+    * userSlice.ts
+    * notificationSlice.ts
+* /types
+* /data (mock data)
+* /validation (Zod schemas)
+
+---
+
+## STATE MANAGEMENT (RTK)
+
+loanSlice must include:
+
+* loans array
+* marketplaceLoans array (IMPORTANT)
+* actions:
+
+  * createLoan
+  * createMarketplaceLoan
+  * applyToLoan
+  * updateLoanStatus
+  * cancelLoan
+
+---
+
+## NAVIGATION
+
+Bottom Tabs:
+
+1. Home
+2. My Loans (Lender)
+3. My Debts (Borrower)
+4. Profile
+
+---
+
+## NEW FEATURE: LOAN MARKETPLACE (VERY IMPORTANT)
+
+This is inside "My Loans" screen.
+
+Add a top tab or toggle with two sections:
+
+1. "My Lending"
+
+   * Loans where user is lender
+
+2. "Marketplace"
+
+   * List of loan requests created by borrowers who selected:
+     "Request Loan (Unknown Lender)"
+
+Marketplace Loan Card must show:
+
+* Requested Amount
+* Borrower Name (or partial for privacy)
+* Short description/purpose
+* Date
+* Status (open/filled)
+
+Each marketplace loan must have:
+
+* Button: "Apply as Lender"
+
+When user clicks:
+
+* Dispatch applyToLoan action
+* Loan moves from marketplace → normal loan list
+* User becomes lender
+* Status becomes "Pending" or "Accepted"
+
+---
+
+## HOME SCREEN UPDATE
+
+When user selects:
+"Request Loan (Unknown Lender)"
+
+* Create a marketplace loan:
+
+  * Stored in marketplaceLoans
+  * Visible to other users in Marketplace tab
+
+---
+
+## LOAN FLOW UPDATE
+
+Marketplace flow:
+
+1. Borrower creates loan (unknown lender)
+2. Loan appears in marketplace
+3. Lender browses marketplace
+4. Lender applies
+5. Loan moves to active loans
+6. Status updates through:
+
+   * Pending → Accepted → Approved → Repaid
+
+---
+
+## NOTIFICATION SYSTEM
+
+Trigger notifications for:
+
+* New marketplace loan
+* Loan accepted
+* Loan approved
+* Loan repaid
+
+---
+
+## UI/UX REQUIREMENTS
+
+Marketplace UI must:
+
+* Look like a clean list/grid of opportunities
+* Use cards
+* Highlight "Apply" button
+* Show status clearly
+
+---
+
+## MOCK DATA
+
+Include:
+
+* Multiple marketplace loans
+* Multiple normal loans
+* Different statuses
+
+---
+
+## DELIVERABLE
+
+* Fully working Expo app
+* Redux fully integrated
+* Marketplace feature working with mock logic
+* Clean UI and navigation
+
+---
+
+The app must feel like a fintech marketplace platform, not just a basic CRUD app.

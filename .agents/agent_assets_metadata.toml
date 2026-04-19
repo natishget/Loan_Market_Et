@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "Ans1mxFmmYtVh1RoJLpas"
+uri = "file://artifacts/loan-market/assets/images/icon.png"
+type = "image"
+title = "loanmarket-app-icon"
