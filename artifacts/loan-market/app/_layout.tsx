@@ -18,14 +18,6 @@ import { store } from "@/store/store";
 
 SplashScreen.preventAutoHideAsync();
 
-function RootLayoutNav() {
-  return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
-  );
-}
-
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
@@ -40,15 +32,21 @@ export default function RootLayout() {
     }
   }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded && !fontError) return null;
-
   return (
     <SafeAreaProvider>
       <ErrorBoundary>
         <Provider store={store}>
-          <GestureHandlerRootView style={{ flex: 1 }}>
+          <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#f0f4f8" }}>
             <KeyboardProvider>
-              <RootLayoutNav />
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="login" options={{ headerShown: false }} />
+                <Stack.Screen name="register" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="notifications"
+                  options={{ headerShown: false }}
+                />
+              </Stack>
             </KeyboardProvider>
           </GestureHandlerRootView>
         </Provider>

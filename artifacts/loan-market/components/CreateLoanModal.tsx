@@ -16,7 +16,11 @@ import { useColors } from "@/hooks/useColors";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { createLoan, createMarketplaceLoan } from "@/store/slices/loanSlice";
 import { addNotification } from "@/store/slices/notificationSlice";
-import { createLoanSchema, createMarketplaceLoanSchema } from "@/validation/loanSchema";
+import {
+  createDirectLoanSchema,
+  createMarketplaceLoanSchema,
+} from "@/validation/loanSchema";
+import { MOCK_USERS } from "@/data/mockData";
 import * as Haptics from "expo-haptics";
 
 type LoanMode = "direct" | "marketplace";
@@ -33,23 +37,23 @@ export function CreateLoanModal({ visible, onClose }: CreateLoanModalProps) {
   const user = useAppSelector((s) => s.auth.user);
 
   const [mode, setMode] = useState<LoanMode>("direct");
+  const [lenderId, setLenderId] = useState("");
   const [amount, setAmount] = useState("");
   const [interestRate, setInterestRate] = useState("");
   const [termMonths, setTermMonths] = useState("");
   const [purpose, setPurpose] = useState("");
   const [description, setDescription] = useState("");
   const [collateral, setCollateral] = useState("");
-  const [borrowerName, setBorrowerName] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const reset = () => {
+    setLenderId("");
     setAmount("");
     setInterestRate("");
     setTermMonths("");
     setPurpose("");
     setDescription("");
     setCollateral("");
-    setBorrowerName("");
     setErrors({});
     setMode("direct");
   };
@@ -72,9 +76,9 @@ export function CreateLoanModal({ visible, onClose }: CreateLoanModalProps) {
     };
 
     if (mode === "direct") {
-      const result = createLoanSchema.safeParse({
+      const result = createDirectLoanSchema.safeParse({
         ...rawData,
-        borrowerName,
+        lenderId,
       });
       if (!result.success) {
         const fieldErrors: Record<string, string> = {};
@@ -84,17 +88,34 @@ export function CreateLoanModal({ visible, onClose }: CreateLoanModalProps) {
         setErrors(fieldErrors);
         return;
       }
+
+      const lenderUser = MOCK_USERS.find((u) => u.id === lenderId);
+      const lenderName = lenderUser?.name || `Lender #${lenderId}`;
+
       dispatch(
         createLoan({
           ...rawData,
-          borrowerId: "external-" + Date.now(),
-          borrowerName: borrowerName || "Unknown Borrower",
-          lenderId: user.id,
-          lenderName: user.name,
+          borrowerId: user.id,
+          borrowerName: user.name,
+          lenderId,
+          lenderName,
         })
       );
+
+      dispatch(
+        addNotification({
+          type: "loan_accepted",
+          title: "Direct Loan Created",
+          message: `Loan of ETB ${parseFloat(amount).toLocaleString()} created with lender ID ${lenderId}.`,
+          loanId: "new",
+        })
+      );
+
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert("Loan Created", "Your direct loan has been created and is pending.");
+      Alert.alert(
+        "Loan Created",
+        "Your direct loan has been created and is pending lender confirmation."
+      );
     } else {
       const result = createMarketplaceLoanSchema.safeParse(rawData);
       if (!result.success) {
@@ -105,11 +126,13 @@ export function CreateLoanModal({ visible, onClose }: CreateLoanModalProps) {
         setErrors(fieldErrors);
         return;
       }
+
       const initials = user.name
         .split(" ")
         .map((n) => n[0])
         .join("")
         .toUpperCase();
+
       dispatch(
         createMarketplaceLoan({
           ...rawData,
@@ -120,18 +143,20 @@ export function CreateLoanModal({ visible, onClose }: CreateLoanModalProps) {
           businessType: user.businessType,
         })
       );
+
       dispatch(
         addNotification({
           type: "new_marketplace_loan",
-          title: "New Loan Opportunity",
-          message: `${user.name} is requesting ETB ${parseFloat(amount).toLocaleString()} for ${purpose}`,
+          title: "Marketplace Request Posted",
+          message: `Your request for ETB ${parseFloat(amount).toLocaleString()} is now visible to lenders.`,
           loanId: "new",
         })
       );
+
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(
-        "Loan Request Posted",
-        "Your request is now visible in the Marketplace."
+        "Request Posted",
+        "Your loan request is now visible in the Marketplace for lenders to find."
       );
     }
     handleClose();
@@ -173,7 +198,10 @@ export function CreateLoanModal({ visible, onClose }: CreateLoanModalProps) {
           <TouchableOpacity
             style={[
               styles.submitBtn,
-              { backgroundColor: colors.primary, borderRadius: colors.radius / 1.5 },
+              {
+                backgroundColor: colors.primary,
+                borderRadius: colors.radius / 1.5,
+              },
             ]}
             onPress={handleSubmit}
           >
@@ -181,7 +209,12 @@ export function CreateLoanModal({ visible, onClose }: CreateLoanModalProps) {
           </TouchableOpacity>
         </View>
 
-        <View style={[styles.modeToggle, { backgroundColor: colors.muted, borderRadius: colors.radius }]}>
+        <View
+          style={[
+            styles.modeToggle,
+            { backgroundColor: colors.muted, borderRadius: colors.radius },
+          ]}
+        >
           <TouchableOpacity
             style={[
               styles.modeBtn,
@@ -195,18 +228,22 @@ export function CreateLoanModal({ visible, onClose }: CreateLoanModalProps) {
             <Feather
               name="users"
               size={14}
-              color={mode === "direct" ? colors.primary : colors.mutedForeground}
+              color={
+                mode === "direct" ? colors.primary : colors.mutedForeground
+              }
             />
             <Text
               style={[
                 styles.modeBtnText,
                 {
                   color:
-                    mode === "direct" ? colors.primary : colors.mutedForeground,
+                    mode === "direct"
+                      ? colors.primary
+                      : colors.mutedForeground,
                 },
               ]}
             >
-              Direct Loan
+              Known Lender
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -223,7 +260,9 @@ export function CreateLoanModal({ visible, onClose }: CreateLoanModalProps) {
               name="globe"
               size={14}
               color={
-                mode === "marketplace" ? colors.primary : colors.mutedForeground
+                mode === "marketplace"
+                  ? colors.primary
+                  : colors.mutedForeground
               }
             />
             <Text
@@ -237,12 +276,12 @@ export function CreateLoanModal({ visible, onClose }: CreateLoanModalProps) {
                 },
               ]}
             >
-              Request (Unknown Lender)
+              Unknown Lender
             </Text>
           </TouchableOpacity>
         </View>
 
-        {mode === "marketplace" && (
+        {mode === "marketplace" ? (
           <View
             style={[
               styles.infoBox,
@@ -253,9 +292,25 @@ export function CreateLoanModal({ visible, onClose }: CreateLoanModalProps) {
               },
             ]}
           >
-            <Feather name="info" size={14} color={colors.primary} />
+            <Feather name="globe" size={14} color={colors.primary} />
             <Text style={[styles.infoText, { color: colors.primary }]}>
-              Your request will be visible in the Marketplace for lenders to discover and apply.
+              Your request will appear in the Marketplace. Any lender can apply.
+            </Text>
+          </View>
+        ) : (
+          <View
+            style={[
+              styles.infoBox,
+              {
+                backgroundColor: colors.accent + "10",
+                borderColor: colors.accent + "30",
+                borderRadius: colors.radius,
+              },
+            ]}
+          >
+            <Feather name="shield" size={14} color={colors.accent} />
+            <Text style={[styles.infoText, { color: colors.accent }]}>
+              Enter the Lender's User ID to create a direct loan agreement.
             </Text>
           </View>
         )}
@@ -267,18 +322,42 @@ export function CreateLoanModal({ visible, onClose }: CreateLoanModalProps) {
           {mode === "direct" && (
             <View style={styles.field}>
               <Text style={[styles.label, { color: colors.foreground }]}>
-                Borrower Name
+                Lender ID
               </Text>
-              <TextInput
-                style={inputStyle}
-                placeholder="Full name of borrower"
-                placeholderTextColor={colors.mutedForeground}
-                value={borrowerName}
-                onChangeText={setBorrowerName}
-              />
-              {errors.borrowerName && (
-                <Text style={styles.error}>{errors.borrowerName}</Text>
+              <View
+                style={[
+                  styles.inputRow,
+                  {
+                    backgroundColor: colors.background,
+                    borderColor: errors.lenderId
+                      ? colors.destructive
+                      : colors.border,
+                    borderRadius: colors.radius / 1.5,
+                  },
+                ]}
+              >
+                <Feather
+                  name="user-check"
+                  size={16}
+                  color={colors.mutedForeground}
+                />
+                <TextInput
+                  style={[styles.inputInner, { color: colors.foreground }]}
+                  placeholder="e.g. user-2 or user-3"
+                  placeholderTextColor={colors.mutedForeground}
+                  value={lenderId}
+                  onChangeText={setLenderId}
+                  autoCapitalize="none"
+                />
+              </View>
+              {errors.lenderId && (
+                <Text style={styles.error}>{errors.lenderId}</Text>
               )}
+              <Text
+                style={[styles.hint, { color: colors.mutedForeground }]}
+              >
+                Demo lender IDs: user-2, user-3, user-4
+              </Text>
             </View>
           )}
 
@@ -449,11 +528,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 8,
+    paddingVertical: 9,
     gap: 6,
   },
   modeBtnText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "600",
   },
   infoBox: {
@@ -485,6 +564,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
     marginBottom: 6,
+  },
+  hint: {
+    fontSize: 11,
+    marginTop: 4,
+  },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 11,
+    gap: 10,
+  },
+  inputInner: {
+    flex: 1,
+    fontSize: 14,
   },
   input: {
     borderWidth: 1,

@@ -1,10 +1,13 @@
 import { Loan, MarketplaceLoan, Notification, User } from "@/types";
 
-export const CURRENT_USER: User = {
+export const DEMO_USER: User = {
   id: "user-1",
   name: "Abebe Girma",
-  phone: "+251 91 234 5678",
+  companyName: "Girma Import & Export PLC",
+  email: "abebe.girma@girmaexport.com",
+  phone: "0987654321",
   tinNumber: "TIN-123456",
+  faydaId: "FAN-ABG-001234",
   businessType: "Import/Export",
   location: "Addis Ababa",
   rating: 4.7,
@@ -14,12 +17,15 @@ export const CURRENT_USER: User = {
 };
 
 export const MOCK_USERS: User[] = [
-  CURRENT_USER,
+  DEMO_USER,
   {
     id: "user-2",
     name: "Tigist Bekele",
-    phone: "+251 92 345 6789",
+    companyName: "Bekele Retail Solutions",
+    email: "tigist@bekeleretail.com",
+    phone: "0912345678",
     tinNumber: "TIN-234567",
+    faydaId: "FAN-TBK-002345",
     businessType: "Retail Trade",
     location: "Hawassa",
     rating: 4.5,
@@ -30,8 +36,11 @@ export const MOCK_USERS: User[] = [
   {
     id: "user-3",
     name: "Dawit Haile",
-    phone: "+251 93 456 7890",
+    companyName: "Haile Manufacturing Works",
+    email: "dawit@haileworks.com",
+    phone: "0934567890",
     tinNumber: "TIN-345678",
+    faydaId: "FAN-DHI-003456",
     businessType: "Manufacturing",
     location: "Dire Dawa",
     rating: 4.9,
@@ -42,8 +51,11 @@ export const MOCK_USERS: User[] = [
   {
     id: "user-4",
     name: "Meron Tadesse",
-    phone: "+251 94 567 8901",
+    companyName: "Tadesse Agri Products",
+    email: "meron@tadesse-agri.com",
+    phone: "0945678901",
     tinNumber: "TIN-456789",
+    faydaId: "FAN-MTD-004567",
     businessType: "Agriculture",
     location: "Bahir Dar",
     rating: 4.3,
@@ -255,15 +267,5 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     loanId: "loan-1",
     read: true,
     createdAt: "2024-11-05T16:45:00",
-  },
-  {
-    id: "notif-5",
-    type: "new_marketplace_loan",
-    title: "New Loan Opportunity",
-    message:
-      "Tigist Bekele is requesting ETB 120,000 for Warehouse Construction",
-    loanId: "mkt-2",
-    read: true,
-    createdAt: "2025-04-12T08:00:00",
   },
 ];

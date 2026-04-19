@@ -1,38 +1,30 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Platform,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColors } from "@/hooks/useColors";
-import { useAppSelector } from "@/store/hooks";
-import { NotificationItem } from "@/components/NotificationItem";
-import { useAppDispatch } from "@/store/hooks";
-import { markAllAsRead } from "@/store/slices/notificationSlice";
-
-type Section = "profile" | "notifications";
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { GlobalHeader } from "@/components/GlobalHeader";
+import { logout } from "@/store/slices/authSlice";
+import { useRouter } from "expo-router";
 
 export default function ProfileScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const user = useAppSelector((s) => s.auth.user);
-  const notifications = useAppSelector((s) => s.notifications.notifications);
   const loans = useAppSelector((s) => s.loans.loans);
 
-  const [activeSection, setActiveSection] = useState<Section>("profile");
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
   const myLoansCount = loans.filter(
     (l) => l.lenderId === user?.id || l.borrowerId === user?.id
   ).length;
-
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
 
   const InfoRow = ({ icon, label, value }: { icon: string; label: string; value: string }) => (
     <View style={[styles.infoRow, { borderBottomColor: colors.border }]}>
@@ -46,62 +38,16 @@ export default function ProfileScreen() {
     </View>
   );
 
+  const handleLogout = () => {
+    dispatch(logout());
+    router.replace("/login");
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: colors.background,
-            paddingTop: topPad + 10,
-            borderBottomColor: colors.border,
-          },
-        ]}
-      >
-        <Text style={[styles.screenTitle, { color: colors.foreground }]}>
-          Profile
-        </Text>
-        <View style={[styles.tabToggle, { backgroundColor: colors.muted, borderRadius: colors.radius }]}>
-          <TouchableOpacity
-            style={[
-              styles.tabBtn,
-              activeSection === "profile" && {
-                backgroundColor: colors.card,
-                borderRadius: colors.radius / 1.5,
-              },
-            ]}
-            onPress={() => setActiveSection("profile")}
-          >
-            <Feather name="user" size={14} color={activeSection === "profile" ? colors.primary : colors.mutedForeground} />
-            <Text style={[styles.tabText, { color: activeSection === "profile" ? colors.primary : colors.mutedForeground }]}>
-              My Profile
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.tabBtn,
-              activeSection === "notifications" && {
-                backgroundColor: colors.card,
-                borderRadius: colors.radius / 1.5,
-              },
-            ]}
-            onPress={() => setActiveSection("notifications")}
-          >
-            <Feather name="bell" size={14} color={activeSection === "notifications" ? colors.primary : colors.mutedForeground} />
-            <Text style={[styles.tabText, { color: activeSection === "notifications" ? colors.primary : colors.mutedForeground }]}>
-              Notifications
-            </Text>
-            {unreadCount > 0 && (
-              <View style={[styles.badge, { backgroundColor: colors.primary }]}>
-                <Text style={styles.badgeText}>{unreadCount}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
+      <GlobalHeader title="Profile" />
 
-      {activeSection === "profile" ? (
-        <ScrollView
+      <ScrollView
           contentContainerStyle={[
             styles.content,
             { paddingBottom: insets.bottom + 100 },
@@ -268,48 +214,23 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             ))}
           </View>
+          <TouchableOpacity
+            style={[
+              styles.logoutBtn,
+              {
+                backgroundColor: "#ef4444" + "15",
+                borderColor: "#ef4444" + "40",
+                borderRadius: colors.radius,
+              },
+            ]}
+            onPress={handleLogout}
+          >
+            <Feather name="log-out" size={16} color="#ef4444" />
+            <Text style={[styles.logoutText, { color: "#ef4444" }]}>
+              Sign Out
+            </Text>
+          </TouchableOpacity>
         </ScrollView>
-      ) : (
-        <ScrollView
-          contentContainerStyle={[
-            styles.content,
-            { paddingBottom: insets.bottom + 100 },
-          ]}
-          showsVerticalScrollIndicator={false}
-        >
-          {unreadCount > 0 && (
-            <TouchableOpacity
-              style={[
-                styles.markAllBtn,
-                {
-                  backgroundColor: colors.secondary,
-                  borderRadius: colors.radius / 1.5,
-                },
-              ]}
-              onPress={() => dispatch(markAllAsRead())}
-            >
-              <Feather name="check" size={14} color={colors.primary} />
-              <Text style={[styles.markAllText, { color: colors.primary }]}>
-                Mark all as read
-              </Text>
-            </TouchableOpacity>
-          )}
-          {notifications.map((notif) => (
-            <NotificationItem key={notif.id} notification={notif} />
-          ))}
-          {notifications.length === 0 && (
-            <View style={styles.emptyState}>
-              <Feather name="bell-off" size={48} color={colors.mutedForeground} />
-              <Text style={[styles.emptyTitle, { color: colors.foreground }]}>
-                No Notifications
-              </Text>
-              <Text style={[styles.emptyText, { color: colors.mutedForeground }]}>
-                You'll be notified about loan updates here.
-              </Text>
-            </View>
-          )}
-        </ScrollView>
-      )}
     </View>
   );
 }
@@ -507,5 +428,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     lineHeight: 20,
+  },
+  logoutBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 14,
+    borderWidth: 1,
+    marginTop: 8,
+  },
+  logoutText: {
+    fontSize: 15,
+    fontWeight: "700",
   },
 });

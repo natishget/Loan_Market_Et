@@ -14,6 +14,7 @@ import { useAppSelector } from "@/store/hooks";
 import { CreateLoanModal } from "@/components/CreateLoanModal";
 import { LoanDetailModal } from "@/components/LoanDetailModal";
 import { LoanCard } from "@/components/LoanCard";
+import { GlobalHeader } from "@/components/GlobalHeader";
 import { Loan } from "@/types";
 
 export default function HomeScreen() {
@@ -21,9 +22,6 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const user = useAppSelector((s) => s.auth.user);
   const loans = useAppSelector((s) => s.loans.loans);
-  const notifications = useAppSelector((s) => s.notifications.notifications);
-  const unreadCount = notifications.filter((n) => !n.read).length;
-
   const [createVisible, setCreateVisible] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
 
@@ -45,17 +43,15 @@ export default function HomeScreen() {
     .filter((l) => l.borrowerId === user?.id && l.status !== "cancelled")
     .reduce((sum, l) => sum + l.amount, 0);
 
-  const topPad =
-    Platform.OS === "web" ? 67 : insets.top;
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <GlobalHeader title="Home" />
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: topPad + 16,
+            paddingTop: 16,
             paddingBottom: insets.bottom + 100,
           },
         ]}
@@ -69,18 +65,6 @@ export default function HomeScreen() {
             <Text style={[styles.name, { color: colors.foreground }]}>
               {user?.name.split(" ")[0]}
             </Text>
-          </View>
-          <View style={styles.headerActions}>
-            {unreadCount > 0 && (
-              <View
-                style={[
-                  styles.badge,
-                  { backgroundColor: colors.primary },
-                ]}
-              >
-                <Text style={styles.badgeText}>{unreadCount}</Text>
-              </View>
-            )}
           </View>
         </View>
 

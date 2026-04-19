@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   Platform,
+  Alert,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -14,11 +15,11 @@ import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { LoanCard } from "@/components/LoanCard";
 import { MarketplaceCard } from "@/components/MarketplaceCard";
 import { LoanDetailModal } from "@/components/LoanDetailModal";
+import { GlobalHeader } from "@/components/GlobalHeader";
 import { applyToLoan } from "@/store/slices/loanSlice";
 import { addNotification } from "@/store/slices/notificationSlice";
 import { Loan, MarketplaceLoan } from "@/types";
 import * as Haptics from "expo-haptics";
-import { Alert } from "react-native";
 
 type Tab = "lending" | "marketplace";
 
@@ -78,24 +79,10 @@ export default function MyLoansScreen() {
     );
   };
 
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
-
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: colors.background,
-            paddingTop: topPad + 10,
-            borderBottomColor: colors.border,
-          },
-        ]}
-      >
-        <Text style={[styles.screenTitle, { color: colors.foreground }]}>
-          My Loans
-        </Text>
-
+      <GlobalHeader title="My Loans" />
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <View
           style={[
             styles.tabToggle,

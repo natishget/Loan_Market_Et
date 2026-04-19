@@ -1,0 +1,232 @@
+You are working on an EXISTING React Native Expo (TypeScript) app that was previously generated but is INCOMPLETE and missing critical features.
+
+Your task is to FIX and COMPLETE the app.
+
+IMPORTANT RULES:
+
+* DO NOT rebuild from scratch
+* DO NOT remove existing working UI unless necessary
+* ONLY fix and implement missing functionality correctly
+* Ensure everything works together
+
+---
+
+## CRITICAL ISSUES TO FIX
+
+1. Authentication (NOT IMPLEMENTED)
+2. Register form incomplete
+3. Loan creation uses name instead of ID
+4. Notification system missing and incorrectly placed
+5. Marketplace logic incomplete or missing
+
+You MUST fix ALL of these.
+
+---
+
+## TASK 1: IMPLEMENT FULL AUTH SYSTEM (FRONTEND ONLY)
+
+Create working authentication using Redux Toolkit:
+
+authSlice:
+
+* isAuthenticated (boolean)
+* user (object)
+* login()
+* logout()
+
+Login Screen:
+
+* Inputs:
+
+  * Phone Number
+  * Password
+* Use Zod validation
+* Demo credentials:
+
+  * Phone: 0987654321
+  * Password: Nati@1234
+* On success:
+  → Dispatch login action
+  → Navigate to main app
+
+Register Screen:
+REQUIRED FIELDS:
+
+* Full Name
+* Company Name
+* TIN Number
+* Email Address
+* Phone Number
+* Fayda ID (FAN)
+* Password
+
+Rules:
+
+* ALL fields required
+* Validate with Zod
+* Store user in Redux (mock)
+
+---
+
+## TASK 2: FIX LOAN CREATION (VERY IMPORTANT)
+
+CURRENT BUG:
+
+* App uses borrower/lender NAME input
+
+FIX:
+
+* REMOVE name-based input
+
+IMPLEMENT:
+
+1. Known Lender Loan:
+
+* Input field:
+  → Lender ID ONLY
+* Validation required
+* Store as lenderId in state
+
+2. Unknown Lender Loan:
+
+* NO lender input
+* Create marketplace loan
+
+---
+
+## TASK 3: IMPLEMENT LOAN MARKETPLACE
+
+In Redux (loanSlice):
+
+Add:
+
+* marketplaceLoans array
+
+Actions:
+
+* createMarketplaceLoan
+* applyToLoan
+
+FLOW:
+
+1. Borrower creates loan (Unknown Lender)
+   → Stored in marketplaceLoans
+
+2. In "My Loans" screen:
+   Add TWO sections:
+
+* My Lending
+* Marketplace
+
+Marketplace must:
+
+* Display all marketplace loans
+* Show:
+
+  * Amount
+  * Borrower ID (NOT name)
+  * Description
+  * Date
+
+Each item must have:
+→ "Apply as Lender" button
+
+On click:
+
+* Assign current user as lender
+* Move loan to main loans array
+* Remove from marketplace
+* Update status
+
+---
+
+## TASK 4: IMPLEMENT GLOBAL NOTIFICATION SYSTEM
+
+CURRENT ISSUE:
+
+* Notifications missing or incorrectly placed
+
+FIX:
+
+1. Create notificationSlice:
+
+* notifications array
+* unread count
+* markAsRead()
+
+2. CREATE GLOBAL HEADER COMPONENT:
+
+Header must include:
+
+* Screen title (left)
+* Notification icon (top-right, Lucide icon)
+
+3. APPLY HEADER TO ALL MAIN SCREENS:
+
+* Home
+* My Loans
+* My Debts
+* Profile
+
+4. Notification icon behavior:
+
+* Navigate to Notification Screen
+* Show unread indicator (badge/dot)
+
+---
+
+## TASK 5: NOTIFICATION TRIGGERS
+
+Add notifications when:
+
+* Marketplace loan created
+* Loan applied
+* Loan accepted
+* Loan approved
+* Loan repaid
+
+---
+
+## TASK 6: UI FIXES
+
+* Ensure all screens render correctly
+
+* Fix broken navigation if exists
+
+* Add status badges for loans:
+
+  * Pending
+  * Accepted
+  * Approved
+  * Repaid
+  * Cancelled
+
+* Keep UI modern and clean
+
+* DO NOT overcomplicate design
+
+---
+
+## TASK 7: VALIDATION (MANDATORY)
+
+Use Zod for:
+
+* Login
+* Register
+* Loan creation
+
+---
+
+## FINAL REQUIREMENTS
+
+* App must run without errors
+* Redux must be properly connected
+* Navigation must work
+* All features must be functional with mock data
+
+---
+
+## OUTPUT FORMAT
+
+* Show ONLY modified and newly created files
+* Clearly explain what was fixed

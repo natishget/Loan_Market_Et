@@ -11,8 +11,11 @@ export type LoanType = "direct" | "marketplace";
 export interface User {
   id: string;
   name: string;
+  companyName: string;
+  email: string;
   phone: string;
   tinNumber: string;
+  faydaId: string;
   businessType: string;
   location: string;
   rating: number;
@@ -64,6 +67,7 @@ export interface Notification {
     | "loan_accepted"
     | "loan_approved"
     | "loan_repaid"
+    | "loan_applied"
     | "payment_due";
   title: string;
   message: string;

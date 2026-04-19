@@ -12,6 +12,7 @@ import { useColors } from "@/hooks/useColors";
 import { useAppSelector } from "@/store/hooks";
 import { LoanCard } from "@/components/LoanCard";
 import { LoanDetailModal } from "@/components/LoanDetailModal";
+import { GlobalHeader } from "@/components/GlobalHeader";
 import { Loan } from "@/types";
 
 export default function MyDebtsScreen() {
@@ -37,8 +38,6 @@ export default function MyDebtsScreen() {
     0
   );
 
-  const topPad = Platform.OS === "web" ? 67 : insets.top;
-
   const allDebts = [
     ...activeDebts,
     ...pendingDebts,
@@ -47,6 +46,7 @@ export default function MyDebtsScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <GlobalHeader title="My Debts" />
       <FlatList
         data={allDebts}
         keyExtractor={(item) => item.id}
@@ -54,16 +54,13 @@ export default function MyDebtsScreen() {
         contentContainerStyle={[
           styles.listContent,
           {
-            paddingTop: topPad + 16,
+            paddingTop: 16,
             paddingBottom: insets.bottom + 100,
             paddingHorizontal: 16,
           },
         ]}
         ListHeaderComponent={
           <>
-            <Text style={[styles.screenTitle, { color: colors.foreground }]}>
-              My Debts
-            </Text>
 
             {activeDebts.length > 0 && (
               <View
